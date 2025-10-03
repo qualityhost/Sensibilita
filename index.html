@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabella di sensibilità di rendimento</title>
+    <!-- Link al CDN di Tailwind CSS per lo stile -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Stili personalizzati -->
+    <style>
+        body {
+            background-color: #506552; /* SFONDO VERDE APPLICATO A TUTTA LA PAGINA */
+        }
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+         h2, h3 {
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-white">Analisi di sensibilità per investimenti immobiliari</h1>
+        </div>
+
+        <!-- PANNELLO DI CONTROLLO -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 mb-8">
+             <h2 class="text-xl font-semibold text-center mb-6">Parametri di base per la simulazione</h2>
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Parametri Principali -->
+                <div class="space-y-4">
+                    <h3 class="font-semibold border-b pb-2">Dati di mercato</h3>
+                    <div>
+                        <label for="adr" class="block text-sm font-medium text-gray-700">Tariffa media base (€)</label>
+                        <input type="number" id="adr" value="125" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="occupazione" class="block text-sm font-medium text-gray-700">Occupazione base (%)</label>
+                        <input type="number" id="occupazione" value="65" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    </div>
+                </div>
+                <!-- Costi -->
+                 <div class="space-y-4">
+                    <h3 class="font-semibold border-b pb-2">Stima Costi per proprietà</h3>
+                     <div>
+                        <label for="commissioni" class="block text-sm font-medium text-gray-700">Commissioni OTA (%)</label>
+                        <input type="number" id="commissioni" value="15" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    </div>
+                     <div>
+                        <label for="costi_operativi_perc" class="block text-sm font-medium text-gray-700">Costi operativi variabili (% su Ricavi)</label>
+                        <input type="number" id="costi_operativi_perc" value="25" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    </div>
+                     <div>
+                        <label for="costi_fissi_annui" class="block text-sm font-medium text-gray-700">Costi fissi annui (€)</label>
+                        <input type="number" id="costi_fissi_annui" value="5000" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    </div>
+                </div>
+                <!-- Parametri di Valutazione -->
+                <div class="space-y-4">
+                    <h3 class="font-semibold border-b pb-2">Parametri di valutazione</h3>
+                    <div>
+                        <label for="capRate" class="block text-sm font-medium text-gray-700">Il tuo Cap rate obiettivo (%)</label>
+                         <input type="range" id="capRate" min="5" max="10" value="8" step="0.25" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2">
+                        <div class="text-right text-sm font-bold text-[#5A8A7B]"><span id="capRateVal">8.00</span>%</div>
+                    </div>
+                    <div>
+                        <label for="percAffitto" class="block text-sm font-medium text-gray-700">Il tuo margine da sublocazione (%)</label>
+                        <input type="range" id="percAffitto" min="40" max="70" value="55" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2">
+                        <div class="text-right text-sm font-bold text-[#5A8A7B]"><span id="percAffittoVal">55</span>%</div>
+                    </div>
+                </div>
+                 <!-- Dati struttura (semplificati) -->
+                 <div class="space-y-4">
+                     <h3 class="font-semibold border-b pb-2">Dati struttura</h3>
+                      <div>
+                        <label for="periodoApertura" class="block text-sm font-medium text-gray-700">Periodo di apertura (mesi)</label>
+                        <input type="number" id="periodoApertura" value="12" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    </div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- MATRICE DI VALUTAZIONE -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 mt-8">
+            <h2 class="text-xl font-semibold text-center text-gray-700 mb-2">Matrice di valutazione dinamica</h2>
+            <p class="text-center text-gray-600 text-sm mb-6">
+                La tabella mostra le stime di acquisto (verde) e affitto annuo (blu) al variare di ADR e occupazione.
+            </p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                        <tr>
+                            <th scope="col" class="py-3 px-6 rounded-tl-lg">Occupazione \ ADR</th>
+                            <th scope="col" class="py-3 px-6 text-center" id="adrHeader0"></th>
+                            <th scope="col" class="py-3 px-6 text-center" id="adrHeader1"></th>
+                            <th scope="col" class="py-3 px-6 text-center bg-gray-200" id="adrHeader2"></th>
+                            <th scope="col" class="py-3 px-6 text-center" id="adrHeader3"></th>
+                            <th scope="col" class="py-3 px-6 text-center rounded-tr-lg" id="adrHeader4"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-white border-b">
+                            <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap" id="occHeader0"></th>
+                            <td class="py-4 px-6 text-center" id="cell-0-0"></td>
+                            <td class="py-4 px-6 text-center" id="cell-0-1"></td>
+                            <td class="py-4 px-6 text-center bg-gray-50" id="cell-0-2"></td>
+                            <td class="py-4 px-6 text-center" id="cell-0-3"></td>
+                            <td class="py-4 px-6 text-center" id="cell-0-4"></td>
+                        </tr>
+                        <tr class="bg-white border-b">
+                            <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap" id="occHeader1"></th>
+                            <td class="py-4 px-6 text-center" id="cell-1-0"></td>
+                            <td class="py-4 px-6 text-center" id="cell-1-1"></td>
+                            <td class="py-4 px-6 text-center bg-gray-50" id="cell-1-2"></td>
+                            <td class="py-4 px-6 text-center" id="cell-1-3"></td>
+                            <td class="py-4 px-6 text-center" id="cell-1-4"></td>
+                        </tr>
+                        <tr class="bg-white border-b">
+                            <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap bg-gray-200" id="occHeader2"></th>
+                            <td class="py-4 px-6 text-center bg-gray-50" id="cell-2-0"></td>
+                            <td class="py-4 px-6 text-center bg-gray-50" id="cell-2-1"></td>
+                            <td class="py-4 px-6 text-center bg-yellow-100 font-bold" id="cell-2-2"></td>
+                            <td class="py-4 px-6 text-center bg-gray-50" id="cell-2-3"></td>
+                            <td class="py-4 px-6 text-center bg-gray-50" id="cell-2-4"></td>
+                        </tr>
+                        <tr class="bg-white border-b">
+                            <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap" id="occHeader3"></th>
+                            <td class="py-4 px-6 text-center" id="cell-3-0"></td>
+                            <td class="py-4 px-6 text-center" id="cell-3-1"></td>
+                            <td class="py-4 px-6 text-center bg-gray-50" id="cell-3-2"></td>
+                            <td class="py-4 px-6 text-center" id="cell-3-3"></td>
+                            <td class="py-4 px-6 text-center" id="cell-3-4"></td>
+                        </tr>
+                        <tr class="bg-white">
+                            <th scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap rounded-bl-lg" id="occHeader4"></th>
+                            <td class="py-4 px-6 text-center" id="cell-4-0"></td>
+                            <td class="py-4 px-6 text-center" id="cell-4-1"></td>
+                            <td class="py-4 px-6 text-center bg-gray-50" id="cell-4-2"></td>
+                            <td class="py-4 px-6 text-center" id="cell-4-3"></td>
+                            <td class="py-4 px-6 text-center rounded-br-lg" id="cell-4-4"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const allInputs = [
+        'adr', 'occupazione', 'commissioni', 'costi_operativi_perc', 'costi_fissi_annui',
+        'capRate', 'percAffitto', 'periodoApertura'
+    ].reduce((acc, id) => {
+        const el = document.getElementById(id);
+        if (el) acc[id] = el;
+        return acc;
+    }, {});
+    
+    const uiElements = {
+        capRateVal: document.getElementById('capRateVal'), 
+        percAffittoVal: document.getElementById('percAffittoVal'),
+    };
+    
+    function formatCurrency(value, compact = false) {
+        if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) return 'N/A';
+        if (compact && Math.abs(value) >= 1000) {
+             return (value / 1000).toLocaleString('it-IT', { maximumFractionDigits: 1 }) + 'k €';
+        }
+        return value.toLocaleString('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    function performCalculations(currentValues) {
+        const values = { ...currentValues }; 
+        
+        const giorniDisponibili = Math.round(values.periodoApertura * 30.4);
+        const nottiPrenotate = Math.round(giorniDisponibili * (values.occupazione / 100));
+        
+        const ricavoLordo = nottiPrenotate * values.adr;
+
+        const commissioniOta = ricavoLordo * (values.commissioni / 100);
+        const altriCostiVariabili = ricavoLordo * (values.costi_operativi_perc / 100);
+        const costiFissi = values.costi_fissi_annui;
+
+        const utileLordo = ricavoLordo - (commissioniOta + altriCostiVariabili + costiFissi);
+        
+        return {
+            ricavoLordo: ricavoLordo,
+            utileLordoPerValutazione: utileLordo,
+        };
+    }
+
+    function masterUpdate() {
+        const values = Object.keys(allInputs).reduce((acc, id) => {
+            const el = allInputs[id];
+            acc[id] = (el.type === 'checkbox') ? el.checked : (parseFloat(el.value) || 0);
+            return acc;
+        }, {});
+
+        uiElements.capRateVal.textContent = values.capRate.toFixed(2); 
+        uiElements.percAffittoVal.textContent = values.percAffitto.toFixed(0); 
+
+        updateValuationMatrix(values);
+    }
+    
+    function updateValuationMatrix(baseValues) {
+        const { adr, occupazione, capRate, percAffitto } = baseValues;
+        const variations = [0.8, 0.9, 1, 1.1, 1.2]; // -20%, -10%, Attuale, +10%, +20%
+
+        variations.forEach((varVal, index) => {
+            document.getElementById(`adrHeader${index}`).textContent = `ADR (${formatCurrency(adr * varVal)})`;
+            document.getElementById(`occHeader${index}`).textContent = `Occ.(${(occupazione * varVal).toFixed(0)}%)`;
+        });
+
+        variations.forEach((occVar, rowIndex) => {
+            variations.forEach((adrVar, colIndex) => {
+                const tempValues = { ...baseValues, adr: adr * adrVar, occupazione: Math.min(100, occupazione * occVar) };
+                const scenarioResult = performCalculations(tempValues);
+                
+                const costoGestioneTeorico = scenarioResult.ricavoLordo * 0.12;
+                const fondoArredi = scenarioResult.ricavoLordo * 0.04;
+                const molRettificatoNoi = scenarioResult.utileLordoPerValutazione - costoGestioneTeorico - fondoArredi;
+
+                let offertaAcquisto = 0;
+                if (molRettificatoNoi > 0 && capRate > 0) {
+                    offertaAcquisto = molRettificatoNoi / (capRate / 100);
+                }
+                // Calcola l'affitto come parte dell'utile che va al proprietario
+                const affittoAnnuo = scenarioResult.utileLordoPerValutazione * (1 - (percAffitto / 100));
+
+                const cell = document.getElementById(`cell-${rowIndex}-${colIndex}`);
+                if(cell) {
+                    cell.innerHTML = `
+                        <div class="flex flex-col leading-tight">
+                            <span class="text-xs text-green-700">Acq: ${formatCurrency(offertaAcquisto, true)}</span>
+                            <span class="text-xs text-blue-700 mt-1">Aff: ${formatCurrency(affittoAnnuo, true)}</span>
+                        </div>
+                    `;
+                }
+            });
+        });
+    }
+    
+    Object.values(allInputs).forEach(el => el.addEventListener('input', masterUpdate));
+
+    masterUpdate();
+});
+</script>
+
+</body>
+</html>
